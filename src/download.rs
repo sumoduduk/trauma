@@ -40,11 +40,11 @@ impl Download {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn new(url: &Url, filename: &str) -> Self {
+    pub fn new(url: &Url, filename: &str, range: Option<(u64, u64)>) -> Self {
         Self {
             url: url.clone(),
             filename: String::from(filename),
-            range_header: None,
+            range_header: range,
         }
     }
 

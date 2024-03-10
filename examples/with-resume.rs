@@ -76,6 +76,7 @@ async fn main() -> Result<(), Report> {
             .file_name()
             .and_then(|n| n.to_str())
             .ok_or(eyre!("invalid path terminator"))?,
+        None,
     );
     let downloads = vec![dl];
 
