@@ -181,6 +181,16 @@ impl Downloader {
             req = req.header(RANGE, format!("bytes={}-", size_on_disk));
         }
 
+        if let Some(range_str) = download.range_header {
+            if can_resume {
+                let start = size_on_disk + range_str.0;
+                let end = range_str.1;
+                req = req.header(RANGE, format!("bytes={start}-{end}"));
+            } else {
+                req = req.header(RANGE, format!("bytes={}-{}", range_str.0, range_str.1));
+            }
+        }
+
         // Add extra headers if needed.
         if let Some(ref h) = self.headers {
             req = req.headers(h.to_owned());

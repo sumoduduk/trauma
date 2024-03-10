@@ -15,6 +15,7 @@ pub struct Download {
     pub url: Url,
     /// File name used to save the file on disk.
     pub filename: String,
+    pub range_header: Option<(u64, u64)>,
 }
 
 impl Download {
@@ -43,6 +44,7 @@ impl Download {
         Self {
             url: url.clone(),
             filename: String::from(filename),
+            range_header: None,
         }
     }
 
@@ -102,6 +104,7 @@ impl TryFrom<&Url> for Download {
                 filename: form_urlencoded::parse(filename.as_bytes())
                     .map(|(key, val)| [key, val].concat())
                     .collect(),
+                range_header: None,
             })
             .ok_or_else(|| {
                 Error::InvalidUrl(format!("the url \"{}\" does not contain a filename", value))
