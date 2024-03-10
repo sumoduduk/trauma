@@ -71,16 +71,22 @@ impl Download {
         client: &ClientWithMiddleware,
     ) -> Result<Option<u64>, reqwest_middleware::Error> {
         let res = client.head(self.url.clone()).send().await?;
-        let headers = res.headers();
-        match headers.get(CONTENT_LENGTH) {
-            None => Ok(None),
-            Some(header_value) => match header_value.to_str() {
-                Ok(v) => match v.to_string().parse::<u64>() {
-                    Ok(v) => Ok(Some(v)),
+
+        if let Some(range) = self.range_header {
+            let len = range.1 - range.0;
+            Ok(Some(len))
+        } else {
+            let headers = res.headers();
+            match headers.get(CONTENT_LENGTH) {
+                None => Ok(None),
+                Some(header_value) => match header_value.to_str() {
+                    Ok(v) => match v.to_string().parse::<u64>() {
+                        Ok(v) => Ok(Some(v)),
+                        Err(_) => Ok(None),
+                    },
                     Err(_) => Ok(None),
                 },
-                Err(_) => Ok(None),
-            },
+            }
         }
     }
 }

@@ -177,9 +177,6 @@ impl Downloader {
         // Request the file.
         debug!("Fetching {}", &download.url);
         let mut req = client.get(download.url.clone());
-        if self.resumable && can_resume {
-            req = req.header(RANGE, format!("bytes={}-", size_on_disk));
-        }
 
         if let Some(range_str) = download.range_header {
             if can_resume {
@@ -189,6 +186,8 @@ impl Downloader {
             } else {
                 req = req.header(RANGE, format!("bytes={}-{}", range_str.0, range_str.1));
             }
+        } else if self.resumable && can_resume {
+            req = req.header(RANGE, format!("bytes={}-", size_on_disk));
         }
 
         // Add extra headers if needed.
